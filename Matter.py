@@ -14,6 +14,7 @@ GRAY     = ( 127, 127, 127)
 BROWN    = ( 165,  42,  42)
 
 import pygame
+import math
 from vec2d import Vec2d
 
 class Matter:
@@ -44,9 +45,24 @@ class Matter:
         
         
 class Planet(Matter):
-    def __init__(self, mass, vel, center, radius):
-        Matter.__init__(self, mass, center, vel)
+    def __init__(self, vel, center, radius, density = None, mass = None):
+        #Ensure mass, radius, and density are constraining each other properly.
+        if density is None:
+            if mass is None:
+                density = 100
+            else:
+                density = mass / (math.pi * radius**2)
+        else:
+            if mass is None:
+                mass = density * (math.pi * radius**2)
+            else:
+                if(not mass == density * (math.pi * radius**2)):
+                    mass == density * (math.pi * radius**2)
+
+        Matter.__init__(self, mass, center, vel)    #Call parent constructor
         self.radius = radius
+       
+        self.density = density
         self.color = RED
         
     def setColor(self, color):
@@ -57,59 +73,3 @@ class Planet(Matter):
                            coords.pos_to_screen(self.center).int(), 
                            int(coords.scalar_to_screen(self.radius)), 0)
         
-        
-class Arrow(Matter):
-    #Init that calls parent.
-    #Sets position vec2d of tip, which can be used with center to determine facing of arrow
-    #Sets active to false. While false, gravitational forces will not act upon it (if statement in main loop performs this check)
-    def __init__(self, mass, center, tip, vel):
-        Matter.__init__(self, mass, center, vel)
-        self.tip = tip
-        self.active = False
-        self.charging = False
-        self.color = BROWN
-        self.tipColor = GRAY
-        self.base = self.center - (self.tip - self.center)
-        
-    def getActive(self):
-        return self.active
-    
-    def setActive(self, state):
-        self.active = state
-    
-    def getCharging(self):
-        return self.charging
-    
-    def setCharging(self, state):
-        self.charging = state
-        
-    def update_pos(self, dt):
-        self.center += self.vel*dt
-        self.tip += self.vel*dt
-        self.base += self.vel*dt
-        
-    def rotateByMouse(self, mouseVec):
-        #print("mouseX", mouseVec.x, "mouseY", mouseVec.y)
-        arrowVec = self.tip - self.base
-        arrowToMouse = mouseVec - self.base
-        baseToCenter = self.center - self.base
-        rotAngle = arrowVec.get_angle_between(arrowToMouse)
-        self.tip = self.base + arrowVec.rotated(rotAngle)
-        self.center = self.base + baseToCenter.rotated(rotAngle)
-                                               
-    def draw(self, screen, coords):
-        #Vectors representing the arrow's direction
-        #print("tipX", self.tip.x, "tipY", self.tip.y, "centerX", self.center.x, "centerY", self.center.y)
-        arrowVec = self.tip - self.base
-        normalizedArrowVec = arrowVec.normalized() 
-        perpendicularArrowVec = normalizedArrowVec.perpendicular()
-        
-        #A set of vec2d points for the arrowhead
-        tipForward = self.tip + normalizedArrowVec*16
-        tipSide1 = self.tip + perpendicularArrowVec*8
-        tipSide2 = self.tip - perpendicularArrowVec*8
-        tipList = [coords.pos_to_screen(tipForward).int(),coords.pos_to_screen(tipSide1).int(),coords.pos_to_screen(tipSide2).int()]
-        
-        #Draws line and triangular arrowhead
-        pygame.draw.line(screen, self.color, coords.pos_to_screen(self.base).int(), coords.pos_to_screen(self.tip).int(), int(coords.scalar_to_screen(10)))
-        pygame.draw.polygon(screen, self.tipColor, tipList, 0)
