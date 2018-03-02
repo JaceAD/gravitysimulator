@@ -43,7 +43,10 @@ def main():
     paused = False
     done = False
     while not done:
-        gameMouse = pygame.mouse
+        gameMouse = pygame.mouse                                #Mouse obj
+        mousePosTup = gameMouse.get_pos()                       #Mouse pos in default coordinates as list
+        mousePosVec = Vec2d(mousePosTup[0], mousePosTup[1])     #Mouse pos in default coordinates as vec2d
+        mouseCoordPos = coords.pos_to_coords(mousePosVec)       #Mouse pos in standardized coords as vec2d
         # --- Main event loop
         for event in pygame.event.get():
             if event.type == pygame.QUIT: # If user clicked close
