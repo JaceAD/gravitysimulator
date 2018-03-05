@@ -22,7 +22,7 @@ class Matter:
         self.vel = vel
         self.mass = mass
         self.center = center
-        self.mom = self.vel*self.mass
+        self.mom = self.vel * self.mass
         self.force = Vec2d(0,0)
         self.color = GRAY
     
