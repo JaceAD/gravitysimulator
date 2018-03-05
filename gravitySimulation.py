@@ -55,7 +55,7 @@ def main():
         
         initVelocity = 0
         
-        newPlanet = Planet(0, (0,0), 0)
+        newPlanet = Planet(Vec2d(0,0), Vec2d(0,0), 0)
         
         # --- Main event loop
         for event in pygame.event.get():
@@ -63,9 +63,11 @@ def main():
                 done = True
             if event.type == pygame.MOUSEBUTTONDOWN:
                 paused = True
-                mouseClicked = True
+                if mouseClicked == False:
+                    mouseClicked = True
                 
                 if mouseClicked == True:
+                    mouseClicked = False
                     mousePosDown = mouseCoordPos
                     #wiil get the pos of Mouse
                     
@@ -74,9 +76,6 @@ def main():
                 #WILL HAVE to change to what user wants
                 newPlanet.radius = 15
                 newPlanet.mass = newPlanet.radius * 200
-                
-                planets.append(newPlanet)
-                newPlanet.draw()
                 
                 #if statement on or off to get the initial 
                 print("Will get the vector for the planet to move on")
@@ -87,6 +86,7 @@ def main():
                 initVelocity = mousePosUp - mousePosDown
                 
                 newPlanet.vel = initVelocity
+                planets.append(newPlanet)
                 #will add new planet to the array of planets with vector of mouse up and mouse click
                 paused = False
 
