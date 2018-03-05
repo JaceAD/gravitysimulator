@@ -47,6 +47,7 @@ def main():
         mousePosTup = gameMouse.get_pos()                       #Mouse pos in default coordinates as list
         mousePosVec = Vec2d(mousePosTup[0], mousePosTup[1])     #Mouse pos in default coordinates as vec2d
         mouseCoordPos = coords.pos_to_coords(mousePosVec)       #Mouse pos in standardized coords as vec2d
+        
         # --- Main event loop
         for event in pygame.event.get():
             if event.type == pygame.QUIT: # If user clicked close
@@ -66,6 +67,9 @@ def main():
             obj.draw(screen, coords) # draw object to screen
             obj.update(dt)
         
+        textFont = pygame.font.Font(None,72)
+        mousePosSurface = textFont.render("x: " + str(mouseCoordPos.x) + " y: " + str(mouseCoordPos.y), 0, WHITE)
+        screen.blit(mousePosSurface, (500,500))
         # --- Update the screen with what we've drawn.
         pygame.display.update()
 
