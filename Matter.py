@@ -28,7 +28,7 @@ class Matter:
     
     def update_force(self, force):
         self.force = force
-        print("ForceX", self.force.x, "ForceY", self.force.y)
+        #print("ForceX", self.force.x, "ForceY", self.force.y)
     def remove_force(self, force):
         self.force -= force
     
@@ -50,6 +50,7 @@ class Planet(Matter):
         if density is None:
             if mass is None:
                 density = 100
+                mass = density * (math.pi*radius**2)
             else:
                 density = mass / (math.pi * radius**2)
         else:

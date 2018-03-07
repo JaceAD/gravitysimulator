@@ -18,6 +18,8 @@ RED      = ( 255,   0,   0)
 BLUE     = (   0,   0, 255)
 GRAY     = ( 127, 127, 127)
 
+newPlanet = None
+
 def main():
     pygame.init()
  
@@ -29,7 +31,7 @@ def main():
     coords = Coords(screen_center.copy(), 1, True)
     # ^ Center of window is (0,0), scale is 1:1, and +y is up
      
-    coords.zoom_at_coords(Vec2d(0,0), 20)
+    coords.zoom_at_coords(Vec2d(0,0), 2)
     # ^Sets camera center
      
     # Used to manage how fast the screen updates
@@ -53,9 +55,9 @@ def main():
         mousePosVec = Vec2d(mousePosTup[0], mousePosTup[1])     #Mouse pos in default coordinates as vec2d
         mouseCoordPos = coords.pos_to_coords(mousePosVec)       #Mouse pos in standardized coords as vec2d
         
-        initVelocity = 0
         
-        newPlanet = Planet(Vec2d(0,0), Vec2d(0,0), 0)
+        
+        initVelocity = 0
         
         # --- Main event loop
         for event in pygame.event.get():
@@ -65,41 +67,60 @@ def main():
                 paused = True
                 if mouseClicked == False:
                     mouseClicked = True
+                    mousePosDown = mouseCoordPos    #wiil get the pos of Mouse at first click location
+                    print("setting planet")
+                    global newPlanet
+                    newPlanet = Planet(Vec2d(0,0), mousePosDown, 15)
                 
                 if mouseClicked == True:
-                    mouseClicked = False
-                    mousePosDown = mouseCoordPos
-                    #wiil get the pos of Mouse
-                    
-                #will place the planet
-                newPlanet.center = mousePosDown
-                #WILL HAVE to change to what user wants
-                newPlanet.radius = 15
-                newPlanet.mass = newPlanet.radius * 200
-                
-                #if statement on or off to get the initial 
-                print("Will get the vector for the planet to move on")
+                    mousePosUp = mouseCoordPos  #For drawing initial velocity vector
+                    #draw a vector on screen here
+                 
             if event.type == pygame.MOUSEBUTTONUP:
                 mouseClicked = False
                 mousePosUp = mouseCoordPos
                 
                 initVelocity = mousePosUp - mousePosDown
+                print("Vel", initVelocity.x, initVelocity.y)
+                initVelocity*= 0.1
+                print("Vel", initVelocity.x, initVelocity.y)
                 
+                initMom = initVelocity * newPlanet.mass
                 newPlanet.vel = initVelocity
+                newPlanet.mom = initMom
                 planets.append(newPlanet)
                 #will add new planet to the array of planets with vector of mouse up and mouse click
                 paused = False
 
                 print("Have to send planet in vector from center to mouse")
+                
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    paused = not paused
+                if event.key == pygame.K_0 or pygame.K_KP0:
+                    com = ForceCalculator.calculateCOM(planets)
+                    comVel = ForceCalculator.calculateCOMVel(planets)
+                    for obj in planets:
+                        obj.center -= com
+                        obj.vel -= comVel
+                        obj.mom = obj.vel * obj.mass
         #If the game is not paused, update the objects in it
-        if(not paused):            
-            for obj in planets:
-                obj.update_force(dt)
+        if(not paused):
+            objLen = len(planets)
+            for i in range(0, objLen):
+                forces = []
+                for j in range(0, objLen):
+                    #Calculate a force that each object has on this object and append it to the list of foces acting on it
+                    if(not i==j):
+                        forces.append(ForceCalculator.calculateGravity(planets[i].center, planets[i].mass, planets[j].center, planets[j].mass, 10))
+                summationForce = ForceCalculator.sumForces(forces)
+                planets[i].update_force(summationForce)
+                planets[i].update(dt)
         
         screen.fill(BLACK) # wipe the screen
         for obj in planets:
             obj.draw(screen, coords) # draw object to screen
-            obj.update(dt)
+            
         
         textFont = pygame.font.Font(None,72)
         mousePosSurface = textFont.render("x: " + str(mouseCoordPos.x) + " y: " + str(mouseCoordPos.y), 0, WHITE)
