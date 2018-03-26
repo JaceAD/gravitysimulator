@@ -44,6 +44,7 @@ def calculateCOM(planets):
             totalMass += planet.mass
             massPos += planet.mass * planet.center
         return massPos/totalMass
+    
 def calculateCOMVel(planets):
     if(len(planets) == 0):
         return Vec2d(0,0)
@@ -56,9 +57,26 @@ def calculateCOMVel(planets):
         return massVel/totalMass
     
 #calculates the force an object planet applies to the subject planet when they are in contact
-def calculateCollision(subjectPlanetCenter, subjectPlanetMass, SubjectPlanetVelocity, subjectPlanetRadius, objectPlanetCenter, objectPlanetRadius):
-    differenceVec = objectPlanetCenter - subjectPlanetCenter #Vector from subject to object
-    lengthOfDifference = differenceVec.get_length()
-    if(lengthOfDifference >= subjectPlanetRadius + objectPlanetRadius):
-        print("placeholder")
-        #Calculate force for collision when they are in contact
+def calculateCollision(pl1, pl2):
+    
+    if(pl1.center.get_distance(pl2.center) < pl1.radius + pl2.radius):
+        m1 = pl1.mass
+        m2 = pl2.mass
+        e = 0
+        r = pl2.center - pl1.center
+        u = 1/((1/m1) + (1/m2))
+        v1 = pl1.vel
+        v2 = pl2.vel
+        n = (pl2.center - pl1.center).normalized()
+        J = (1+e)*u*((v2 - v1).dot(n))
+        d = pl1.radius + pl2.radius - (pl1.center - pl2.center).mag()
+        L = u*r.cross(v2 - v1)
+        Jang = -d * L/(r.mag()*(r.mag()+d)) * n.perpendicular()
+        pl1.mom -= Jang
+        pl2.mom += Jang
+        pl1.center = pl1.center - (u/m1)*d*n
+        pl2.center = pl2.center + (u/m2)*d*n
+        
+        if (J < 0):
+            pl1.mom += J * n
+            pl2.mom -= J * n

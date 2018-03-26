@@ -113,10 +113,18 @@ def main():
                     #Calculate a force that each object has on this object and append it to the list of foces acting on it
                     if(not i==j):
                         forces.append(ForceCalculator.calculateGravity(planets[i].center, planets[i].mass, planets[j].center, planets[j].mass, 10))
+                    
                 summationForce = ForceCalculator.sumForces(forces)
                 planets[i].update_force(summationForce)
+            for i in range(0, objLen):
                 planets[i].update(dt)
-        
+            
+            #goes through the array of planets to see if they are colliding and if they are then, caclulate the collision
+            for i in range(0, objLen):
+                for j in range(0, objLen):
+                    if(not i==j):
+                        ForceCalculator.calculateCollision(planets[i], planets[j])
+                     
         screen.fill(BLACK) # wipe the screen
         for obj in planets:
             obj.draw(screen, coords) # draw object to screen
