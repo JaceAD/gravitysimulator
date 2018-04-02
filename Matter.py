@@ -49,7 +49,7 @@ class Planet(Matter):
         #Ensure mass, radius, and density are constraining each other properly.
         if density is None:
             if mass is None:
-                density = 100
+                density = 1
                 mass = density * (math.pi*radius**2)
             else:
                 density = mass / (math.pi * radius**2)
@@ -73,4 +73,31 @@ class Planet(Matter):
         pygame.draw.circle(screen, self.color, 
                            coords.pos_to_screen(self.center).int(), 
                            int(coords.scalar_to_screen(self.radius)), 0)
+
+class Wall(Matter):
+    def __init__(self, center, angle, length, thickness):
+        Matter.__init__(self, 2000000, center, Vec2d(0,0))
+        self.angle = math.radians(angle)
+        self.thickness = thickness
+        self.length = length
+        self.color = WHITE
+        self.end1 = Vec2d(0,0)
+        self.end2 = Vec2d(0,0)
+        self.setEndpoints()
+        
+    def setEndpoints(self):
+        x1 = self.center.x + self.length * math.cos(self.angle)
+        x2 = self.center.x - self.length * math.cos(self.angle)
+        y1 = self.center.y + self.length * math.sin(self.angle)
+        y2 = self.center.y - self.length * math.sin(self.angle)
+        self.end1 = Vec2d(x1, y1)
+        self.end2 = Vec2d(x2, y2)
+        
+    def getEndpoints(self):
+        return [self.end1, self.end2]
+    
+    def draw(self, screen, coords):
+        pygame.draw.line(screen, self.color, coords.pos_to_screen(self.getEndpoints()[0]),
+                         coords.pos_to_screen(self.getEndpoints()[1]),
+                         self.thickness)    
         

@@ -9,6 +9,7 @@ from vec2d import Vec2d
 from coords import Coords
 import ForceCalculator
 from Matter import Planet
+from Matter import Wall
 
 # Define some colors
 BLACK    = (   0,   0,   0)
@@ -40,7 +41,7 @@ def main():
     planets = [];
 
     frame_rate = 60
-    playback_speed = 4
+    playback_speed = 1
     dt = playback_speed/frame_rate
     paused = False
     done = False
@@ -48,6 +49,10 @@ def main():
     mouseClicked = False
     mousePosDown = Vec2d(0,0)
     mousePosUp = Vec2d(0,0)
+    
+    wall1 = Wall(Vec2d(150, 0), 45, 212, 4)
+    wall2 = Wall(Vec2d(-150,0), -45, 212, 4)
+    
     
     while not done:
         gameMouse = pygame.mouse                                #Mouse obj
@@ -114,7 +119,8 @@ def main():
                     if(not i==j):
                         forces.append(ForceCalculator.calculateGravity(planets[i].center, planets[i].mass, planets[j].center, planets[j].mass, 10))
                     
-                summationForce = ForceCalculator.sumForces(forces)
+                summationForce = ForceCalculator.sumForces(forces)  #Currently result of all gravitational forces from other planets
+                summationForce += ForceCalculator.calculateGravity(planets[i].center, planets[i].mass, Vec2d(0, -1000000000), 600000000000000000, 10) #Gravity of "Earth" acting on this "ball"
                 planets[i].update_force(summationForce)
             for i in range(0, objLen):
                 planets[i].update(dt)
@@ -128,7 +134,8 @@ def main():
         screen.fill(BLACK) # wipe the screen
         for obj in planets:
             obj.draw(screen, coords) # draw object to screen
-            
+        wall1.draw(screen, coords)
+        wall2.draw(screen, coords)
         
         textFont = pygame.font.Font(None,72)
         mousePosSurface = textFont.render("x: " + str(mouseCoordPos.x) + " y: " + str(mouseCoordPos.y), 0, WHITE)
