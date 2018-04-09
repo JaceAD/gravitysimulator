@@ -83,7 +83,9 @@ class Wall(Matter):
         self.color = WHITE
         self.end1 = Vec2d(0,0)
         self.end2 = Vec2d(0,0)
+        self.normal = Vec2d(0,0)
         self.setEndpoints()
+        
         
     def setEndpoints(self):
         x1 = self.center.x + self.length * math.cos(self.angle)
@@ -92,6 +94,9 @@ class Wall(Matter):
         y2 = self.center.y - self.length * math.sin(self.angle)
         self.end1 = Vec2d(x1, y1)
         self.end2 = Vec2d(x2, y2)
+        dx = x2 - x1
+        dy = y2 - y1
+        self.normal = Vec2d(-dy, dx)
         
     def getEndpoints(self):
         return [self.end1, self.end2]

@@ -113,15 +113,16 @@ def main():
         if(not paused):
             objLen = len(planets)
             for i in range(0, objLen):
-                forces = []
-                for j in range(0, objLen):
-                    #Calculate a force that each object has on this object and append it to the list of foces acting on it
-                    if(not i==j):
-                        forces.append(ForceCalculator.calculateGravity(planets[i].center, planets[i].mass, planets[j].center, planets[j].mass, 10))
-                    
-                summationForce = ForceCalculator.sumForces(forces)  #Currently result of all gravitational forces from other planets
-                summationForce += ForceCalculator.calculateGravity(planets[i].center, planets[i].mass, Vec2d(0, -1000000000), 600000000000000000, 10) #Gravity of "Earth" acting on this "ball"
+#                forces = []
+#                for j in range(0, objLen):
+#                    #Calculate a force that each object has on this object and append it to the list of foces acting on it
+#                    if(not i==j):
+#                        forces.append(ForceCalculator.calculateGravity(planets[i].center, planets[i].mass, planets[j].center, planets[j].mass, 10))
+#                    
+#                summationForce = ForceCalculator.sumForces(forces)  #Currently result of all gravitational forces from other planets
+                summationForce = ForceCalculator.calculateGravity(planets[i].center, planets[i].mass, Vec2d(0, -1000000000), 600000000000000000, 10) #Gravity of "Earth" acting on this "ball"
                 planets[i].update_force(summationForce)
+            
             for i in range(0, objLen):
                 planets[i].update(dt)
             
@@ -130,6 +131,11 @@ def main():
                 for j in range(0, objLen):
                     if(not i==j):
                         ForceCalculator.calculateCollision(planets[i], planets[j])
+                ForceCalculator.calculateWallCollision(planets[i], wall1)
+                ForceCalculator.calculateWallCollision(planets[i], wall2)
+                        
+            for i in range(0, objLen):
+                planets[i].update(dt)
                      
         screen.fill(BLACK) # wipe the screen
         for obj in planets:

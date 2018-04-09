@@ -80,3 +80,30 @@ def calculateCollision(pl1, pl2):
         if (J < 0):
             pl1.mom += J * n
             pl2.mom -= J * n
+            pl1.update_vel()
+            pl2.update_vel()
+            
+def calculateWallCollision(obj, wall):
+    R = obj.radius;
+    n = wall.normal;
+    d = R - (n.dot(obj.center - wall.end2))
+    tangent = n.perpendicular_normal()
+    if (d > 0):
+        m = obj.mass
+        u = m
+        v1 = obj.vel
+        J = 1.6*u*((v1).dot(n))
+        obj.center = obj.center + (u/m)*d*n
+        if(J < 0):
+            obj.mom -= J*n
+        Fric = -obj.mass * obj.vel.dot(tangent)
+        cf = 0.75
+        if(abs(Fric) > cf * J):
+            ratio = cf * J/abs(Fric)
+            Fric *= ratio
+        else:
+            ratio = 1
+        
+        ratio *= obj.vel.dot(tangent)/obj.vel.dot(n)
+        
+        obj.mom -= Fric * tangent
