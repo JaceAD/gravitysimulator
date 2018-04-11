@@ -86,7 +86,7 @@ def calculateCollision(pl1, pl2):
 def calculateWallCollision(obj, wall):
     R = obj.radius;
     n = wall.normal;
-    d = R - (n.dot(obj.center - wall.end2))
+    d = R - (n.dot(obj.center - wall.end1))
     tangent = n.perpendicular_normal()
     if (d > 0):
         m = obj.mass

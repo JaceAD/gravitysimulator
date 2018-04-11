@@ -51,8 +51,10 @@ def main():
     mousePosUp = Vec2d(0,0)
     
     wall1 = Wall(Vec2d(150, 0), 45, 212, 4)
-    wall2 = Wall(Vec2d(-150,0), -45, 212, 4)
+    wall2 = Wall(Vec2d(-150,0), 315, 212, 4)
     
+    print(wall1.normal)
+    print(wall2.normal)
     
     while not done:
         gameMouse = pygame.mouse                                #Mouse obj

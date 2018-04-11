@@ -96,7 +96,7 @@ class Wall(Matter):
         self.end2 = Vec2d(x2, y2)
         dx = x2 - x1
         dy = y2 - y1
-        self.normal = Vec2d(-dy, dx)
+        self.normal = Vec2d(dy, -dx).normalized()
         
     def getEndpoints(self):
         return [self.end1, self.end2]
