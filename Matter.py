@@ -50,15 +50,15 @@ class Planet(Matter):
         if density is None:
             if mass is None:
                 density = 1
-                mass = density * (math.pi*radius**2)
+                mass = density * (math.pi*radius**4)
             else:
-                density = mass / (math.pi * radius**2)
+                density = mass / (math.pi * radius**4)
         else:
             if mass is None:
-                mass = density * (math.pi * radius**2)
+                mass = density * (math.pi * radius**4)
             else:
-                if(not mass == density * (math.pi * radius**2)):
-                    mass == density * (math.pi * radius**2)
+                if(not mass == density * (math.pi * radius**4)):
+                    mass == density * (math.pi * radius**4)
 
         Matter.__init__(self, mass, center, vel)    #Call parent constructor
         self.radius = radius
@@ -73,6 +73,41 @@ class Planet(Matter):
         pygame.draw.circle(screen, self.color, 
                            coords.pos_to_screen(self.center).int(), 
                            int(coords.scalar_to_screen(self.radius)), 0)
+
+class CircleLine(Matter):
+    def __init__(self, vel, center, radius, density = None, mass = None, angle = 0):
+        #Ensure mass, radius, and density are constraining each other properly.
+        if density is None:
+            if mass is None:
+                density = 1
+                mass = density * (math.pi*radius**4)
+            else:
+                density = mass / (math.pi * radius**4)
+        else:
+            if mass is None:
+                mass = density * (math.pi * radius**4)
+            else:
+                if(not mass == density * (math.pi * radius**4)):
+                    mass == density * (math.pi * radius**4)
+
+        Matter.__init__(self, mass, center, vel)    #Call parent constructor
+        self.radius = radius
+       
+        self.density = density
+        self.color = RED
+        self.angle = angle
+        
+    def setColor(self, color):
+        self.color = color
+    
+    def draw(self, screen, coords):
+        lineX = self.radius * math.cos(self.angle)
+        lineY = self.radius * math.sin(self.angle)
+        endpoint = Vec2d(lineX, lineY)
+        pygame.draw.circle(screen, self.color, 
+                           coords.pos_to_screen(self.center).int(), 
+                           int(coords.scalar_to_screen(self.radius)), 0)
+        pygame.draw.line(screen, WHITE, coords.pos_to_screen(self.center), coords.pos_to_screen(endpoint), 3)
 
 class Wall(Matter):
     def __init__(self, center, angle, length, thickness):

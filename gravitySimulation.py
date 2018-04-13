@@ -10,6 +10,7 @@ from coords import Coords
 import ForceCalculator
 from Matter import Planet
 from Matter import Wall
+from Matter import CircleLine
 
 # Define some colors
 BLACK    = (   0,   0,   0)
@@ -50,8 +51,8 @@ def main():
     mousePosDown = Vec2d(0,0)
     mousePosUp = Vec2d(0,0)
     
-    wall1 = Wall(Vec2d(150, 0), 45, 212, 4)
-    wall2 = Wall(Vec2d(-150,0), 315, 212, 4)
+    wall1 = Wall(Vec2d(150, 0), 45, 213, 4)
+    wall2 = Wall(Vec2d(-150,0), 315, 213, 4)
     
     print(wall1.normal)
     print(wall2.normal)
@@ -77,7 +78,7 @@ def main():
                     mousePosDown = mouseCoordPos    #wiil get the pos of Mouse at first click location
                     print("setting planet")
                     global newPlanet
-                    newPlanet = Planet(Vec2d(0,0), mousePosDown, 15)
+                    newPlanet = CircleLine(Vec2d(0,0), mousePosDown, 15)
                 
                 if mouseClicked == True:
                     mousePosUp = mouseCoordPos  #For drawing initial velocity vector
