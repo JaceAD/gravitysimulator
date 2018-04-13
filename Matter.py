@@ -101,8 +101,8 @@ class CircleLine(Matter):
         self.color = color
     
     def draw(self, screen, coords):
-        lineX = self.radius * math.cos(self.angle)
-        lineY = self.radius * math.sin(self.angle)
+        lineX = self.center.x + (self.radius*math.cos(self.angle))
+        lineY = self.center.y + (self.radius*math.sin(self.angle))
         endpoint = Vec2d(lineX, lineY)
         pygame.draw.circle(screen, self.color, 
                            coords.pos_to_screen(self.center).int(), 
