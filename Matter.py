@@ -34,10 +34,13 @@ class Matter:
     
     def update_mom(self, dt):
         self.mom += self.force*dt
+        
     def update_vel(self):
-        self.vel.copy_in(self.mom/self.mass)
+        self.vel = self.mom/self.mass
+        
     def update_pos(self, dt):
         self.center += self.vel*dt
+        
     def update(self, dt):
         self.update_mom(dt)
         self.update_vel()
@@ -75,7 +78,7 @@ class Planet(Matter):
                            int(coords.scalar_to_screen(self.radius)), 0)
 
 class CircleLine(Matter):
-    def __init__(self, vel, center, radius, density = None, mass = None, angle = 0):
+    def __init__(self, vel, center, radius, density = None, mass = None, angle = 0, angvel = 0):
         #Ensure mass, radius, and density are constraining each other properly.
         if density is None:
             if mass is None:
@@ -96,6 +99,26 @@ class CircleLine(Matter):
         self.density = density
         self.color = RED
         self.angle = angle
+        self.angvel = angvel
+        self.torque = 0
+        self.moment = (1/2)*self.mass*(self.radius**2)
+        self.angMom = self.moment*self.angvel
+        
+    def update_mom(self, dt):
+        self.mom += self.force*dt
+        self.angMom += self.torque*dt
+        self.update_vel()
+        self.angvel = self.angMom/self.moment
+        
+    def update_pos(self, dt):
+        self.center += self.vel*dt
+        self.angle += self.angvel*dt
+        
+    def impulse(self, J, rj):
+        self.mom += J
+        self.update_vel()
+        self.angMom += (rj - self.center).cross(J)
+        self.angvel = self.angMom/self.moment
         
     def setColor(self, color):
         self.color = color
