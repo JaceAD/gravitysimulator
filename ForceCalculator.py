@@ -77,19 +77,10 @@ def calculateCollision(pl1, pl2):
         
         
         
-        n = (pl2.center - pl1.center).normalized()
+        n = (pl1.center - pl2.center).normalized()
         d = pl1.radius + pl2.radius - (pl1.center - pl2.center).mag()
-        L = u*r.cross(v2 - v1)
-        Jang = -d * L/(r.mag()*(r.mag()+d)) * n.perpendicular()
-        pl1.mom -= Jang
-        pl2.mom += Jang
-        pl1.center = pl1.center - (u/m1)*d*n
-        pl2.center = pl2.center + (u/m2)*d*n
-        
-        pl1.update_vel()
-        pl2.update_vel()
-        
-        
+        pl1.center = pl1.center + (u/m1)*d*n
+        pl2.center = pl2.center - (u/m2)*d*n
         
         t = n.perpendicular()
         vt = (v1 - v2).dot(t) - (pl1.radius*w1) - (pl2.radius * w2)
@@ -99,7 +90,7 @@ def calculateCollision(pl1, pl2):
             rj = pl1.center - pl1.radius*n
             mt = 1/((1/m1) + (pl1.radius**2 / pl1.moment) + (1/m2) + (pl2.radius**2 / pl2.moment))
             Jt = -mt*vt
-            mu = 0.2
+            mu = 0.5
             
             
             
@@ -117,26 +108,56 @@ def calculateCollision(pl1, pl2):
 #            pl2.update_vel()
             
 def calculateWallCollision(obj, wall):
-    R = obj.radius;
-    n = wall.normal;
-    d = R - (n.dot(obj.center - wall.end1))
-    tangent = n.perpendicular_normal()
-    if (d > 0):
-        m = obj.mass
-        u = m
+    n = wall.normal
+#    d = R - (n.dot(obj.center - wall.end1))
+#    tangent = n.perpendicular_normal()
+#    if (d > 0):
+#        m = obj.mass
+#        u = m
+#        v1 = obj.vel
+#        J = 1.6*u*((v1).dot(n))
+#        obj.center = obj.center + (u/m)*d*n
+#        if(J < 0):
+#            obj.mom -= J*n
+#        Fric = -obj.mass * obj.vel.dot(tangent)
+#        cf = 0.75
+#        if(abs(Fric) > cf * J):
+#            ratio = cf * J/abs(Fric)
+#            Fric *= ratio
+#        else:
+#            ratio = 1
+#        
+#        ratio *= obj.vel.dot(tangent)/obj.vel.dot(n)
+#        
+#        obj.mom -= Fric * tangent
+        
+        
+    d = obj.radius - n.dot(obj.center - wall.center)    
+    if d > 0:
+        m1 = obj.mass
+        m2 = wall.mass
+        e = 0
+        r = wall.center - obj.center
+        obj.center +=  d*n
+        u = 1/((1/m1) + (1/m2))
+        
         v1 = obj.vel
-        J = 1.6*u*((v1).dot(n))
-        obj.center = obj.center + (u/m)*d*n
-        if(J < 0):
-            obj.mom -= J*n
-        Fric = -obj.mass * obj.vel.dot(tangent)
-        cf = 0.75
-        if(abs(Fric) > cf * J):
-            ratio = cf * J/abs(Fric)
-            Fric *= ratio
-        else:
-            ratio = 1
         
-        ratio *= obj.vel.dot(tangent)/obj.vel.dot(n)
+        w1 = obj.angvel        
         
-        obj.mom -= Fric * tangent
+        t = n.perpendicular()
+        vt = (v1).dot(t) - (obj.radius*w1)
+        
+        Jn = -(1+e)*u*((v1).dot(n))
+        if (Jn > 0):
+            rj = obj.center - obj.radius*n
+            mt = 1/((1/m1) + (obj.radius**2 / obj.moment))
+            Jt = -mt*vt
+            mu = 0.5
+            if (abs(Jt) > mu * abs(Jn)):
+                Jt *= (mu * abs(Jn))/abs(Jt) 
+            
+            J = Jn*n + Jt*t
+            
+            obj.impulse(J, rj)
+            #pl2.impulse(J * -1, rj)
